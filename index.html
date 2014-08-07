@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8" />
+	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+	<title>Where's the fucking train?</title>
+	<link rel="stylesheet" type="text/css" href="/styles.css" />
+	<meta name="viewport" content="width=device-width, initial-scale=1" />
+	<meta name="apple-mobile-web-app-capable" content="yes">
+</head>
+<body>
+	<header>
+		<section>
+			<div id="last-updated-container">Updated <time id="last-updated"></time></div>
+			<span id="header-logo"></button>
+		</section>
+	</header>
+
+	<div id="throbber-container">
+		<div id="throbber">
+			Loading...
+		</div>
+	</div>
+
+	<section id="live-stations"></section>
+<!--
+	<div id="menu">
+		<section>
+			<button class="close">&times;</button>
+			<h2 class="current-station"></div>
+			<div class="section">Save current station</div>
+			<div class="section">Go to current location</div>
+			<div class="section train-lines">
+				<div class="mta-bullet line-1">1</div>
+				<div class="mta-bullet line-2">2</div>
+				<div class="mta-bullet line-3">3</div>
+				<div class="mta-bullet line-4">4</div>
+				<div class="mta-bullet line-5">5</div>
+				<div class="mta-bullet line-6">6</div>
+			</div>
+		</section>
+	</div> -->
+
+	<footer>
+		<a href="http://www.jonthornton.com">Jon Thornton</a> &copy; 2014 &hearts; NYC
+	</footer>
+
+	<script src="//ajax.googleapis.com/ajax/libs/jquery/2.1.1/jquery.min.js"></script>
+	<script src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/1.3.0/handlebars.min.js"></script>
+
+	<script id="station-template" type="text/x-handlebars-template">
+		<div class="station">
+			<h2><a href="/#/l/{{coords location}}">{{name}}</a></h2>
+			{{#if hasData}}
+				<div class="uptown">
+					{{#each N}}
+						<div class="train">
+							<span class="direction-icon">&#9650;</span>
+							<span class="mta-bullet line-{{route}}">{{route}}</span>
+							<time datetime="{{time}}"></time>
+						</div>
+					{{/each}}
+				</div>
+				<div class="downtown">
+					{{#each S}}
+						<div class="train">
+							<span class="direction-icon">&#9660;</span>
+							<span class="mta-bullet line-{{route}}">{{route}}</span>
+							<time datetime="{{time}}"></time>
+						</div>
+					{{/each}}
+				</div>
+				<div class="clearfix"></div>
+			{{else}}
+				<div class="no-data">No data available</div>
+			{{/if}}
+		</div>
+	</script>
+
+	<script>
+
+		var stationSource = $("#station-template").html();
+		var stationTemplate = Handlebars.compile(stationSource);
+
+		Handlebars.registerHelper('coords', function(location) {
+		  return (+location[0].toFixed(6)) + "," + (+location[1].toFixed(6));
+		});
+
+		$(window).on('hashchange', function(e){
+			window.scrollTo(0, 0);
+
+			$('#throbber-container').slideDown(100);
+			getLocation(loadLocationData);
+		});
+
+		$('#header-logo').on('click', function(e){
+			e.preventDefault();
+
+			$('#menu').slideDown(150);
+		});
+
+		$('#menu .close').on('click', function(e){
+			e.preventDefault();
+			$('#menu').slideUp(150);
+		});
+
+		getLocation(loadLocationData);
+
+		function getLocation(callback) {
+			var urlCoords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
+			if (urlCoords) {
+				callback(1*urlCoords[1], 1*urlCoords[3]);
+			} else if ("geolocation" in navigator) {
+				navigator.geolocation.getCurrentPosition(function(position) {
+					callback(position.coords.latitude, position.coords.longitude);
+				});
+			} else {
+				// load station list
+			}
+		}
+
+		function loadLocationData(lat, lon) {
+			replaceState('/l/'+lat+','+lon);
+
+			$.getJSON('http://localhost:5000/by-location?lat='+lat+'&lon='+lon, function(resp){
+				$('#last-updated').attr('datetime', resp.updated);
+
+				$('#live-stations .station').remove();
+				var container = $('#live-stations');
+
+				for (var i in resp.data) {
+					var stationData = resp.data[i];
+					var html = stationTemplate(stationData);
+					container.append(html);
+				}
+
+				refreshRelativeTimes();
+
+				$('#throbber-container').fadeOut(1000);
+			});
+		}
+
+		function replaceState(url) {
+			if (!("replaceState" in history)) {
+				return;
+			}
+
+			url = '/#'+url;
+			history.replaceState({}, null, url)
+		}
+
+		function refreshRelativeTimes() {
+			var now = Date.now()
+			$('time[datetime]').each(function(){
+				$this = $(this);
+				var trainTime = new Date($this.attr('datetime'));
+				var minutesDiff = Math.ceil((trainTime.getTime() - now) / 60000);
+
+				if (minutesDiff == 0) {
+					$this.text('Now');
+				} else if (minutesDiff < 0) {
+					$this.text(Math.abs(minutesDiff) + ' min ago');
+				} else {
+					$this.text(minutesDiff + ' min');
+				}
+			});
+		}
+		refreshRelativeTimes()
+	</script>
+</body>
+</html>
