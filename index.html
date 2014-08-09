@@ -4,7 +4,7 @@
 	<meta charset="UTF-8" />
 	<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 	<title>Where's the fucking train?</title>
-	<link rel="stylesheet" type="text/css" href="/styles.css" />
+	<link rel="stylesheet" type="text/css" href="/dist/styles.css" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="apple-mobile-web-app-capable" content="yes">
 </head>
@@ -12,7 +12,7 @@
 	<header>
 		<section>
 			<div id="last-updated-container">Updated <time id="last-updated"></time></div>
-			<span id="header-logo"></button>
+			<span id="header-logo"></span>
 		</section>
 	</header>
 
@@ -23,23 +23,25 @@
 	</div>
 
 	<section id="live-stations"></section>
-<!--
+
 	<div id="menu">
 		<section>
-			<button class="close">&times;</button>
-			<h2 class="current-station"></div>
-			<div class="section">Save current station</div>
-			<div class="section">Go to current location</div>
-			<div class="section train-lines">
+			<span class="close close-button">&times;</span>
+			<h2 class="current-station close"></h2>
+			<div class="menu-item" id="goto-location">Go to current location</div>
+			<div class="menu-item" id="goto-favorite-locations">Favorite stations</div>
+			<div class="menu-item" id="bookmark-station">Bookmark <span class="current-station"></span></div>
+			<div class="train-lines">
 				<div class="mta-bullet line-1">1</div>
 				<div class="mta-bullet line-2">2</div>
 				<div class="mta-bullet line-3">3</div>
 				<div class="mta-bullet line-4">4</div>
 				<div class="mta-bullet line-5">5</div>
 				<div class="mta-bullet line-6">6</div>
+				<div class="mta-bullet line-L">L</div>
 			</div>
 		</section>
-	</div> -->
+	</div>
 
 	<footer>
 		<a href="http://www.jonthornton.com">Jon Thornton</a> &copy; 2014 &hearts; NYC
@@ -90,7 +92,10 @@
 			window.scrollTo(0, 0);
 
 			$('#throbber-container').slideDown(100);
-			getLocation(loadLocationData);
+			var coords = locationFromHash();
+			if (coords) {
+				loadLocationData(coords[0], coords[1]);
+			}
 		});
 
 		$('#header-logo').on('click', function(e){
@@ -104,20 +109,52 @@
 			$('#menu').slideUp(150);
 		});
 
-		getLocation(loadLocationData);
+		var coords = locationFromHash();
+		if (coords) {
+			loadLocationData(coords[0], coords[1]);
+		} else if ("geolocation" in navigator) {
+			loadLocationDataFromGPS();
+		} else {
+			// load station list
+		}
 
-		function getLocation(callback) {
+		function locationFromHash(){
 			var urlCoords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
 			if (urlCoords) {
-				callback(1*urlCoords[1], 1*urlCoords[3]);
-			} else if ("geolocation" in navigator) {
-				navigator.geolocation.getCurrentPosition(function(position) {
-					callback(position.coords.latitude, position.coords.longitude);
-				});
-			} else {
-				// load station list
+				return [1*urlCoords[1], 1*urlCoords[3]];
 			}
 		}
+
+		function loadLocationDataFromGPS()
+		{
+			if ("geolocation" in navigator) {
+				$('#throbber-container').slideDown(100);
+
+				var geolocate = {
+					success: function(position) {
+						clearTimeout(errorTimer);
+						loadLocationData(position.coords.latitude, position.coords.longitude);
+					},
+					error: function(){
+						// error!
+						clearTimeout(errorTimer);
+						alert('WTFT couldn\'t find your current location. Pick a station from the list.');
+						$('#throbber-container').slideUp(150);
+					},
+					options: {
+						enableHighAccuracy: false,
+						timeout: 3000,
+						maximumAge: 600000
+					}
+				}
+				var errorTimer = setTimeout(geolocate.error, 5000);
+
+				navigator.geolocation.getCurrentPosition(geolocate.success, geolocate.error, geolocate.options);
+			} else {
+				return false;
+			}
+		}
+
 
 		function loadLocationData(lat, lon) {
 			replaceState('/l/'+lat+','+lon);
@@ -134,9 +171,11 @@
 					container.append(html);
 				}
 
+				$('.current-station').text(resp.data[0].name);
+
 				refreshRelativeTimes();
 
-				$('#throbber-container').fadeOut(1000);
+				$('#throbber-container').slideUp(150);
 			});
 		}
 
@@ -146,7 +185,12 @@
 			}
 
 			url = '/#'+url;
-			history.replaceState({}, null, url)
+			if (window.location.hash.length > 0) {
+				history.pushState({}, null, url);
+			} else {
+				history.replaceState({}, null, url);
+			}
+
 		}
 
 		function refreshRelativeTimes() {
@@ -166,6 +210,11 @@
 			});
 		}
 		refreshRelativeTimes()
+
+		$('#goto-location').on('click', function(e){
+			$('#menu').slideUp(150);
+			loadLocationDataFromGPS();
+		});
 	</script>
 </body>
 </html>
