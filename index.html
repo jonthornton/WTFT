@@ -7,6 +7,10 @@
 	<link rel="stylesheet" type="text/css" href="/dist/styles.css" />
 	<meta name="viewport" content="width=device-width, initial-scale=1" />
 	<meta name="apple-mobile-web-app-capable" content="yes">
+
+	<script>
+		var API_URL = 'http://localhost:5000';
+	</script>
 </head>
 <body>
 	<header>
@@ -175,7 +179,7 @@
 		function loadLocationData(lat, lon) {
 			replaceState('/l/'+lat+','+lon);
 
-			$.getJSON('http://localhost:5000/by-location?lat='+lat+'&lon='+lon, function(resp){
+			$.getJSON(API_URL+'/by-location?lat='+lat+'&lon='+lon, function(resp){
 				$('#last-updated').attr('datetime', resp.updated);
 
 				$('#live-stations .station').remove();
