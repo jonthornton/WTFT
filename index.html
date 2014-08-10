@@ -29,8 +29,8 @@
 			<span class="close close-button">&times;</span>
 			<h2 class="current-station close"></h2>
 			<div class="menu-item" id="goto-location">Go to current location</div>
-			<div class="menu-item" id="goto-favorite-locations">Favorite stations</div>
-			<div class="menu-item" id="bookmark-station">Bookmark <span class="current-station"></span></div>
+			<div class="menu-item local-storage-only" id="goto-favorite-locations">Favorite stations</div>
+			<div class="menu-item local-storage-only" id="bookmark-station">Bookmark <span class="current-station"></span></div>
 			<div class="train-lines">
 				<div class="mta-bullet line-1">1</div>
 				<div class="mta-bullet line-2">2</div>
@@ -100,7 +100,6 @@
 
 		$('#header-logo').on('click', function(e){
 			e.preventDefault();
-
 			$('#menu').slideDown(150);
 		});
 
@@ -118,6 +117,23 @@
 			// load station list
 		}
 
+		// screen for localStorage support
+		try {
+			if (!('localStorage' in window)) {
+				$('.local-storage-only').hide();
+			}
+		} catch (e) {
+			$('.local-storage-only').hide();
+		}
+
+		refreshRelativeTimes()
+		setInterval(refreshRelativeTimes, 10000);
+
+		$('#goto-location').on('click', function(e){
+			loadLocationDataFromGPS();
+			$('#menu').slideUp(150);
+		});
+
 		function locationFromHash(){
 			var urlCoords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
 			if (urlCoords) {
@@ -128,7 +144,7 @@
 		function loadLocationDataFromGPS()
 		{
 			if ("geolocation" in navigator) {
-				$('#throbber-container').slideDown(100);
+				$('#throbber-container').slideDown(150);
 
 				var geolocate = {
 					success: function(position) {
@@ -143,11 +159,11 @@
 					},
 					options: {
 						enableHighAccuracy: false,
-						timeout: 3000,
+						timeout: 10000,
 						maximumAge: 600000
 					}
 				}
-				var errorTimer = setTimeout(geolocate.error, 5000);
+				var errorTimer = setTimeout(geolocate.error, 20000);
 
 				navigator.geolocation.getCurrentPosition(geolocate.success, geolocate.error, geolocate.options);
 			} else {
@@ -209,12 +225,6 @@
 				}
 			});
 		}
-		refreshRelativeTimes()
-
-		$('#goto-location').on('click', function(e){
-			$('#menu').slideUp(150);
-			loadLocationDataFromGPS();
-		});
 	</script>
 </body>
 </html>
