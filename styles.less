@@ -22,6 +22,7 @@ section {
 	position: absolute;
 	top: 0;
 	right: 0;
+	cursor: pointer;
 }
 
 #last-updated-container {
@@ -107,7 +108,7 @@ section {
 	-webkit-border-radius: 999px;
 	-moz-border-radius: 999px;
 	border-radius: 999px;
-
+	text-decoration: none;
 }
 .mta-bullet.line-4,
 .mta-bullet.line-5,
@@ -127,9 +128,11 @@ section {
 }
 
 
+.mta-bullet.line-S {
+	background-color: #808183;
+}
 
-
-footer {
+.footer {
 	text-align: center;
 	font-size: 12px;
 	font-weight: bold;
@@ -142,7 +145,23 @@ footer {
 	}
 }
 
-#throbber-container {
+.logo-150 {
+	display: inline-block;
+	width: 150px;
+	height: 150px;
+	background-image: url('/logo-150.png');
+	overflow: hidden;
+	text-indent: -9999px;
+}
+
+@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
+	.logo-150 {
+		background-image: url('/logo-300.png');
+		background-size: 100% 100%;
+	}
+}
+
+#throbber {
 	height: 100%;
 	width: 100%;
 	position: fixed;
@@ -150,6 +169,23 @@ footer {
 	left: 0;
 	z-index: 1000;
 	background: #ccc;
+
+	.logo-150 {
+		-webkit-animation: throbber 2s infinite linear;
+		-moz-animation: throbber 2s infinite linear;
+		-ms-animation: throbber 2s infinite linear;
+		-o-animation: throbber 2s infinite linear;
+		animation: throbber 2s infinite linear;
+		-webkit-backface-visibility: hidden;
+		backface-visibility: hidden;
+		-webkit-perspective: 1000;
+		perspective: 1000;
+		position: absolute;
+		top: 50%;
+		left: 50%;
+		margin-left: -75px;
+		margin-top: -75px;
+	}
 }
 
 @-webkit-keyframes throbber {
@@ -182,36 +218,6 @@ footer {
 	}
 }
 
-#throbber {
-	-webkit-animation: throbber 2s infinite linear;
-	-moz-animation: throbber 2s infinite linear;
-	-ms-animation: throbber 2s infinite linear;
-	-o-animation: throbber 2s infinite linear;
-	animation: throbber 2s infinite linear;
-	-webkit-backface-visibility: hidden;
-	backface-visibility: hidden;
-	-webkit-perspective: 1000;
-	perspective: 1000;
-	position: absolute;
-	top: 50%;
-	left: 50%;
-	margin-left: -75px;
-	margin-top: -75px;
-	overflow: hidden;
-	text-indent: -9999px;
-	width: 150px;
-	height: 150px;
-	background-image: url('/logo-150.png');
-
-
-}
-@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
-	#throbber {
-		background-image: url('/logo-300.png');
-		background-size: 100% 100%;
-	}
-}
-
 #menu {
 	display: none;
 	position: fixed;
@@ -222,6 +228,7 @@ footer {
 	width: 100%;
 	background: #ccc;
 	color: #333;
+	overflow-y: scroll;
 
 	.close-button {
 		display: block;
@@ -254,6 +261,35 @@ footer {
 		line-height: 1.4;
 		margin: 25px 0 0 0;
 	}
+
+	.logo-150 {
+		display: block;
+		margin: 20px auto;
+	}
 }
 
+#error {
+	display: none;
+	position: fixed;
+	z-index: 10;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	background: #ccc;
+	color: #333;
+	overflow-y: scroll;
+	font-size: 20px;
+	text-align: center;
+	section {
+		margin-top: 20px;
+	}
+}
 
+#try-again {
+	width: 150px;
+	padding: 10px 0;
+	border: 3px solid #333;
+	margin: 40px auto;
+	cursor: pointer;
+}
