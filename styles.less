@@ -5,10 +5,24 @@ body {
 	font-weight: 300;
 	font-size: 16px;
 	margin: 0;
+	position: fixed;
+	overflow: hidden;
+	width: 100%;
+}
+
+.page {
+	position: fixed;
+	top: 0;
+	left: 0;
+	height: 100%;
+	width: 100%;
+	overflow-y: scroll;
+	overflow-x: hidden;
+	z-index: 1;
 }
 
 section {
-	max-width: 340px;
+	max-width: 310px;
 	margin: 0 auto;
 	position: relative;
 }
@@ -31,7 +45,7 @@ section {
 
 #last-updated-container,
 #menu h2 {
-	margin: 10px 0 0 5px;
+	margin: 10px 0 0 0;
 	font-size: 28px;
 	font-weight: 300;
 	display: inline-block;
@@ -48,7 +62,7 @@ section {
 
 .station {
 	position: relative;
-	margin: 0 0 10px 5px;
+	margin: 0 0 10px 0;
 
 	h2 {
 		font-size: 23px;
@@ -81,6 +95,7 @@ section {
 
 .train time {
 	display: inline-block;
+	vertical-align: text-top;
 	width: 60px;
 	text-align: right;
 	white-space: nowrap;
@@ -101,7 +116,6 @@ section {
 	height: 1.3em;
 	margin-top: -0.3em;
 	line-height: 1.25;
-	vertical-align: middle;
 	text-align: center;
 	font-weight: bold;
 	color: #FFF;
@@ -220,15 +234,9 @@ section {
 
 #menu {
 	display: none;
-	position: fixed;
 	z-index: 10;
-	top: 0;
-	left: 0;
-	height: 100%;
-	width: 100%;
 	background: #ccc;
 	color: #333;
-	overflow-y: scroll;
 
 	.close-button {
 		display: block;
@@ -243,14 +251,21 @@ section {
 	}
 	h2 {
 		width: 270px;
-		line-height: 1;
 		color: #eee;
+	}
+	h3 {
+		font-weight: inherit;
+		margin: 30px 0 5px 0;
+	}
+
+	p {
+		margin: 5px 0 15px 0;
 	}
 
 	.menu-item {
 		font-weight: 300;
 		color: #444;
-		margin: 25px 0 15px 5px;
+		margin: 25px 0 15px 0;
 		line-height: 1;
 		font-size: 23px;
 		cursor: pointer;
@@ -259,7 +274,7 @@ section {
 	.train-lines {
 		font-size: 45px;
 		line-height: 1.4;
-		margin: 25px 0 0 0;
+		margin: 25px 0 40px 0;
 	}
 
 	.logo-150 {
