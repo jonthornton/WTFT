@@ -13,6 +13,8 @@
     "test",
     "tests"
   ],
-  "dependencies": {},
+  "dependencies": {
+    "fastclick": "~1.0.3"
+  },
   "devDependencies": {}
 }

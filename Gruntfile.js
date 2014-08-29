@@ -12,6 +12,16 @@ module.exports = function(grunt) {
 				files: {"dist/styles.css": "styles.less"}
 			}
 		},
+        uglify: {
+            options: {
+                report: 'gzip'
+            },
+            dist: {
+                files: {
+                    'dist/fastclick.min.js': 'bower_components/fastclick/lib/fastclick.js',
+                }
+            }
+        },
 		watch: {
 			scripts: {
 				files: '**/*.less',
@@ -22,8 +32,9 @@ module.exports = function(grunt) {
 			},
 		},
 	 });
+     grunt.loadNpmTasks('grunt-contrib-uglify');
 	 grunt.loadNpmTasks('grunt-contrib-less');
 	 grunt.loadNpmTasks('grunt-contrib-watch');
 
-	 grunt.registerTask('default', ['less']);
+	 grunt.registerTask('default', ['less', 'uglify']);
  };
