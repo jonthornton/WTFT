@@ -26,6 +26,12 @@
 	<meta name="msapplication-TileImage" content="/mstile-144x144.png">
 	<meta name="application-name" content="WTF Train">
 
+	<meta property="og:title" content="Where's the fucking train?" />
+	<meta property="og:type" content="website" />
+	<meta property="og:url" content="http://wheresthefuckingtrain.com" />
+	<meta property="og:image" content="http://wheresthefuckingtrain.com/logo-300.png" />
+	<meta property="og:description" content="Real-time train arrival times for the NYC subway, so you can know where the fucking train is." />
+
 	<script>
 		var API_URL = 'http://localhost:5000';
 	</script>
@@ -53,10 +59,10 @@
 	<div class="page" id="menu">
 		<section>
 			<span class="close close-button">&times;</span>
-			<h2 class="current-station close"></h2>
+			<h2 class="current-station close">Where's the fucking train?</h2>
 			<div class="menu-item geolocate-only" id="goto-location">Go to current location</div>
-			<div class="menu-item local-storage-only" id="goto-favorite-locations">Favorite stations</div>
-			<div class="menu-item local-storage-only" id="bookmark-station">Bookmark <span class="current-station"></span></div>
+			<!-- <div class="menu-item local-storage-only" id="goto-favorite-locations">Favorite stations</div>
+			<div class="menu-item local-storage-only" id="bookmark-station">Bookmark <span class="current-station"></span></div> -->
 			<div class="train-lines">
 				<a href="#/r/1" class="mta-bullet line-1">1</a>
 				<a href="#/r/2" class="mta-bullet line-2">2</a>
@@ -82,10 +88,14 @@
 		</div>
 	</div>
 
-	<div id="error">
+	<div id="error" class="page">
 		<section>
 			<div id="error-message"></div>
-			<div id="try-again">Try again</div>
+			<div id="error-buttons">
+				<a class="button" id="try-again">Try again</a>
+				<a class="button" href="#menu">Menu</a>
+			</div>
+			<div class="logo-150"></div>
 		</section>
 	</div>
 
@@ -147,6 +157,15 @@
 			window.scrollTo(0, 0);
 			$('#menu').hide();
 			$('#error').hide();
+
+			if (!window.location.hash.match(/[[\/]+/)) {
+				var page = $(window.location.hash + '.page');
+				if (page.length) {
+					$('#throbber').slideUp(150);
+					page.show();
+					return;
+				}
+			}
 
 			var coords = locationFromHash();
 			if (coords) {
