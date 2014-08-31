@@ -46,7 +46,7 @@
 	<div class="page">
 		<section>
 			<div id="last-updated-container">Updated <time id="last-updated"></time></div>
-			<span id="header-logo"></span>
+			<a id="header-logo" href="#menu"></a>
 			<div id="live-stations"></div>
 			<div class="footer">
 				&copy; 2014 <a href="http://www.jonthornton.com">Jon Thornton</a> &hearts; NYC
@@ -158,7 +158,7 @@
 			$('#menu').hide();
 			$('#error').hide();
 
-			if (!window.location.hash.match(/[[\/]+/)) {
+			if (window.location.hash.length > 2 && !window.location.hash.match(/[\/]+/)) {
 				var page = $(window.location.hash + '.page');
 				if (page.length) {
 					$('#throbber').slideUp(150);
