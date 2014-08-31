@@ -234,6 +234,7 @@
 						// error!
 						clearTimeout(errorTimer);
 						alert('WTFT couldn\'t find your current location. Pick a station from the list.');
+						$('#menu').show();
 						$('#throbber').slideUp(150);
 					},
 					options: {
