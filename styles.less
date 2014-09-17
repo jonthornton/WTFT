@@ -5,9 +5,9 @@ body {
 	font-weight: 300;
 	font-size: 16px;
 	margin: 0;
+	width: 100%;
 	position: fixed;
 	overflow: hidden;
-	width: 100%;
 }
 
 .page {
@@ -32,7 +32,7 @@ section {
 	height: 44px;
 	width: 44px;
 	padding: 5px;
-	background: url('/logo-44.png') center center no-repeat;
+	background: url('/logo-white-44.png') center center no-repeat;
 	display: block;
 	position: absolute;
 	top: 0;
@@ -88,6 +88,11 @@ section {
 	.train {
 		margin-bottom: 8px;
 	}
+
+	.train:nth-child(n+6){
+	    display: none;
+	}
+
 	.no-data {
 		color: #555;
 		margin: -5px 0 10px 0;
@@ -104,12 +109,8 @@ section {
 	overflow: visible;
 }
 
-.uptown .direction-icon {
-	color: #444;
-}
-
-.downtown .direction-icon {
-	color: #444;
+.direction-icon {
+	color: #555;
 }
 
 .mta-bullet {
@@ -146,6 +147,21 @@ section {
 
 .mta-bullet.line-S {
 	background-color: #808183;
+}
+
+#legend {
+	font-size: 12px;
+	white-space: nowrap;
+	h3 {
+		text-transform: uppercase;
+		color: #444;
+		font-size: 11px;
+		margin: 30px 0 0 0;
+	}
+	.uptown {
+		display: inline-block;
+		width: 150px;
+	}
 }
 
 .footer {
