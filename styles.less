@@ -32,7 +32,8 @@ section {
 	height: 44px;
 	width: 44px;
 	padding: 5px;
-	background: url('/logo-white-44.png') center center no-repeat;
+	background: url('/logo-white-44@2x.png') center center no-repeat;
+	background-size: 44px 44px;
 	display: block;
 	position: absolute;
 	top: 0;
@@ -181,16 +182,10 @@ section {
 	display: inline-block;
 	width: 150px;
 	height: 150px;
-	background-image: url('/logo-150.png');
+	background-image: url('/logo-300.png');
+	background-size: 150px 150px;
 	overflow: hidden;
 	text-indent: -9999px;
-}
-
-@media (-webkit-min-device-pixel-ratio: 1.5), (min-resolution: 144dpi) {
-	.logo-150 {
-		background-image: url('/logo-300.png');
-		background-size: 100% 100%;
-	}
 }
 
 #throbber {
