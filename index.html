@@ -39,9 +39,9 @@
 		</div>
 	</div>
 
-	<div class="page" id="menu">
+	<div id="menu">
 		<section>
-			<span class="close close-button">&times;</span>
+			<span class="close close-button" onclick="history.go(-1);">&times;</span>
 			<h2 class="current-station close">Where's the fucking train?</h2>
 			<a class="menu-item geolocate-only" href="#">Go to current location</a>
 			<!-- <div class="menu-item local-storage-only" id="goto-favorite-locations">Favorite stations</div>
@@ -71,22 +71,15 @@
 		</div>
 	</div>
 
-	<div id="error" class="page">
+	<div id="trains">
 		<section>
-			<div id="error-message"></div>
-			<div id="error-buttons">
-				<a class="button" id="try-again">Try again</a>
+			<div id="last-updated-container">Updated <time id="last-updated">never</time></div>
+			<a id="header-logo" href="#menu"></a>
+			<div class="error" id="status"></div>
+			<div class="error" id="error-buttons">
+				<span class="button" id="try-again" onclick="window.location.reload()">Try again</span>
 				<a class="button" href="#menu">Menu</a>
 			</div>
-			<div class="logo-150"></div>
-		</section>
-	</div>
-
-	<div class="page">
-		<section>
-			<div id="last-updated-container">Updated <time id="last-updated"></time></div>
-			<a id="header-logo" href="#menu"></a>
-			<div id="status"></div>
 			<div id="live-stations"></div>
 			<div id="legend">
 				<h3>Legend</h3>
@@ -161,45 +154,38 @@
 		{
 			// start with a clean slate
 			window.scrollTo(0, 0);
-			$('#menu').hide();
-			$('#error').hide();
 			clearTimeout(refreshTimer);
+			$('.error').hide();
 			if (ajaxHandle) {
 				ajaxHandle.abort();
 				ajaxHandle = null;
 			}
 
-			if (window.location.hash.length > 2 && !window.location.hash.match(/[\/]+/)) {
-				var page = $(window.location.hash + '.page');
-				if (page.length) {
-					page.show();
-					hideThrobber();
-					return;
-				}
+			if (window.location.hash == '#menu') {
+				$('#menu').slideDown(150);
+				hideThrobber();
+				$('#trains').hide();
+				return;
 			}
 
-			var coords = locationFromHash();
+			$('#trains').show();
+			$('#menu').hide();
+
+			var coords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
 			if (coords) {
-				loadTrainData(coords[0], coords[1]);
+				// lat/lon from URL
+				loadTrainData(1*coords[1], 1*coords[3]);
 			} else if (window.location.hash.charAt(2) == 'r') {
+				// train route id
 				loadTrainData(window.location.hash.charAt(4));
 			} else {
+				// use GPS
 				loadTrainData();
 			}
 		}
 
 		$(window).on('hashchange', route);
 		route();
-
-		$('#header-logo').on('click', function(e){
-			e.preventDefault();
-			$('#menu').slideDown(150);
-		});
-
-		$('#menu .close').on('click', function(e){
-			e.preventDefault();
-			$('#menu').slideUp(150);
-		});
 
 		// screen for html5 feature support
 		if (!('localStorage' in window)) {
@@ -211,17 +197,6 @@
 
 		refreshRelativeTimes()
 		setInterval(refreshRelativeTimes, 10000);
-
-		$('#try-again').on('click', function(e){
-			route();
-		});
-
-		function locationFromHash(){
-			var urlCoords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
-			if (urlCoords) {
-				return [1*urlCoords[1], 1*urlCoords[3]];
-			}
-		}
 
 		function gotoGPSLocation()
 		{
@@ -236,8 +211,8 @@
 						// error!
 						clearTimeout(errorTimer);
 						alert('WTFT couldn\'t find your current location. Pick a station from the list.');
-						$('#menu').show();
-						hideThrobber();
+						replaceState('menu');
+						route();
 					},
 					options: {
 						enableHighAccuracy: false,
@@ -249,7 +224,8 @@
 
 				navigator.geolocation.getCurrentPosition(geolocate.success, geolocate.error, geolocate.options);
 			} else {
-				$('#menu').show();
+				replaceState('menu');
+				route();
 			}
 		}
 
@@ -268,13 +244,14 @@
 			// resp.status always seems to be 0...
 			switch(resp.status) {
 				case 404:
-					$('#menu').slideDown(150);
+					replaceState('menu');
+					route();
 					break;
 
 				case 500:
 				case 0:
-					$('#error-message').text('There was a problem communicating with the server.');
-					$('#error').show();
+					$('#status').text('There was a problem communicating with the server.');
+					$('.error').show();
 			}
 
 			clearTimeout(refreshTimer);
@@ -313,9 +290,15 @@
 
 		function hydrateStations(data, updated)
 		{
-			$('#last-updated').attr('datetime', updated);
+			if (new Date().getTime() - new Date(updated).getTime() > 0) {
+				// stale data from MTA feed
+				$('#status').text('The MTA isn\'t providing accurate train data right now :(');
+				$('#status').show();
+			} else {
+				$('.error').hide();
+			}
 
-			// TODO: show error if stale data
+			$('#last-updated').attr('datetime', updated);
 
 			$('#live-stations .station').remove();
 			var container = $('#live-stations');
