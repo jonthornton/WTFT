@@ -34,7 +34,7 @@
 
 	<script>
 		var API_URL = 'http://localhost:5000';
-		var REFRESH_INTERVAL = 60000;
+		var REFRESH_INTERVAL = 6000;
 	</script>
 </head>
 <body>
@@ -71,7 +71,7 @@
 		<section>
 			<span class="close close-button">&times;</span>
 			<h2 class="current-station close">Where's the fucking train?</h2>
-			<div class="menu-item geolocate-only" id="goto-location">Go to current location</div>
+			<a class="menu-item geolocate-only" href="#">Go to current location</a>
 			<!-- <div class="menu-item local-storage-only" id="goto-favorite-locations">Favorite stations</div>
 			<div class="menu-item local-storage-only" id="bookmark-station">Bookmark <span class="current-station"></span></div> -->
 			<div class="train-lines">
@@ -163,6 +163,7 @@
 		});
 
 		var refreshTimer;
+		var ajaxHandle;
 		function route()
 		{
 			// start with a clean slate
@@ -170,28 +171,27 @@
 			$('#menu').hide();
 			$('#error').hide();
 			clearTimeout(refreshTimer);
+			if (ajaxHandle) {
+				ajaxHandle.abort();
+				ajaxHandle = null;
+			}
 
 			if (window.location.hash.length > 2 && !window.location.hash.match(/[\/]+/)) {
 				var page = $(window.location.hash + '.page');
 				if (page.length) {
-					hideThrobber();
 					page.show();
+					hideThrobber();
 					return;
 				}
 			}
 
 			var coords = locationFromHash();
 			if (coords) {
-				showThrobber();
-				loadLocationData(coords[0], coords[1]);
+				loadTrainData(coords[0], coords[1]);
 			} else if (window.location.hash.charAt(2) == 'r') {
-				showThrobber();
-				loadRouteData(window.location.hash.charAt(4));
-			} else if ("geolocation" in navigator) {
-				showThrobber();
-				loadLocationDataFromGPS();
+				loadTrainData(window.location.hash.charAt(4));
 			} else {
-				$('#menu').show();
+				loadTrainData();
 			}
 		}
 
@@ -219,11 +219,6 @@
 		refreshRelativeTimes()
 		setInterval(refreshRelativeTimes, 10000);
 
-		$('#goto-location').on('click', function(e){
-			loadLocationDataFromGPS();
-			$('#menu').hide();
-		});
-
 		$('#try-again').on('click', function(e){
 			route();
 		});
@@ -235,14 +230,14 @@
 			}
 		}
 
-		function loadLocationDataFromGPS()
+		function gotoGPSLocation()
 		{
 			if ("geolocation" in navigator) {
 				var geolocate = {
 					success: function(position) {
 						clearTimeout(errorTimer);
 						replaceState('/l/'+position.coords.latitude+','+position.coords.longitude);
-						loadLocationData(position.coords.latitude, position.coords.longitude);
+						route();
 					},
 					error: function(){
 						// error!
@@ -261,7 +256,7 @@
 
 				navigator.geolocation.getCurrentPosition(geolocate.success, geolocate.error, geolocate.options);
 			} else {
-				return false;
+				$('#menu').show();
 			}
 		}
 
@@ -289,29 +284,38 @@
 					$('#error').show();
 			}
 
+			clearTimeout(refreshTimer);
 			hideThrobber();
 		}
 
-		function loadLocationData(lat, lon) {
-			$.getJSON(API_URL+'/by-location?lat='+lat+'&lon='+lon)
-				.done(function(resp){
-					hydrateStations(resp.data, resp.updated);
-					refreshTimer = setTimeout(function(){
-						loadLocationData(lat, lon);
-					}, REFRESH_INTERVAL);
-				})
-				.fail(ajaxErrorHandler);
-		}
+		function loadTrainData(lat, lon, noThrobber)
+		{
+			if (!noThrobber) {
+				showThrobber();
+			}
 
-		function loadRouteData(route_id) {
-			$.getJSON(API_URL+'/by-route/'+route_id)
+			if (!lat && !lon) {
+				return gotoGPSLocation();
+			}
+
+			var endpoint;
+			if (lon && $.isNumeric(lat)) {
+				// lat/lon
+				endpoint = API_URL+'/by-location?lat='+lat+'&lon='+lon;
+			} else {
+				// train line
+				endpoint = API_URL+'/by-route/'+lat;
+			}
+
+			ajaxHandle = $.getJSON(endpoint)
 				.done(function(resp){
 					hydrateStations(resp.data, resp.updated);
-					refreshTimer = setTimeout(function(){
-						loadRouteData(route_id)
-					}, REFRESH_INTERVAL);
 				})
 				.fail(ajaxErrorHandler);
+
+			refreshTimer = setTimeout(function(){
+				loadTrainData(lat, lon, true);
+			}, REFRESH_INTERVAL);
 		}
 
 		function hydrateStations(data, updated)
@@ -324,8 +328,7 @@
 			var container = $('#live-stations');
 
 			for (var i in data) {
-				var stationData = data[i];
-				var html = stationTemplate(stationData);
+				var html = stationTemplate(data[i]);
 				container.append(html);
 			}
 
