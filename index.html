@@ -89,7 +89,12 @@
 				<span class="downtown">
 					<span class="direction-icon">&#9660;</span> Downtown / Brooklyn
 				</span>
+
+				<div id="permalink-container">
+					Showing nearby stations. <a href="#" id="permalink">Permalink</a>
+				</div>
 			</div>
+
 			<div class="footer">
 				&copy; 2014 <a href="http://www.jonthornton.com">Jon Thornton</a> &hearts; NYC
 			</div>
@@ -137,6 +142,8 @@
 	</script>
 
 	<script>
+	// don't pollute the global namespace!
+	(function(){
 		var stationSource = $("#station-template").html();
 		var stationTemplate = Handlebars.compile(stationSource);
 
@@ -148,14 +155,14 @@
 		  return route_id.charAt(0);
 		});
 
-		var refreshTimer;
-		var ajaxHandle;
+		var refreshTimer, ajaxHandle, coords;
 		function route()
 		{
 			// start with a clean slate
 			window.scrollTo(0, 0);
 			clearTimeout(refreshTimer);
 			$('.error').hide();
+			$('#permalink-container').hide();
 			if (ajaxHandle) {
 				ajaxHandle.abort();
 				ajaxHandle = null;
@@ -171,7 +178,7 @@
 			$('#trains').show();
 			$('#menu').hide();
 
-			var coords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
+			coords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
 			if (coords) {
 				// lat/lon from URL
 				loadTrainData(1*coords[1], 1*coords[3]);
@@ -204,8 +211,7 @@
 				var geolocate = {
 					success: function(position) {
 						clearTimeout(errorTimer);
-						replaceState('/l/'+position.coords.latitude+','+position.coords.longitude);
-						route();
+						loadTrainData(position.coords.latitude, position.coords.longitude);
 					},
 					error: function(){
 						// error!
@@ -268,10 +274,15 @@
 				return gotoGPSLocation();
 			}
 
-			var endpoint;
+			var endpoint, permalink;
 			if (lon && $.isNumeric(lat)) {
 				// lat/lon
 				endpoint = API_URL+'/by-location?lat='+lat+'&lon='+lon;
+				permalink = '#/l/'+lat+','+lon;
+				if (window.location.hash != permalink) {
+					$('#permalink').prop('href', permalink)
+					$('#permalink-container').show();
+				}
 			} else {
 				// train line
 				endpoint = API_URL+'/by-route/'+lat;
@@ -290,7 +301,7 @@
 
 		function hydrateStations(data, updated)
 		{
-			if (new Date().getTime() - new Date(updated).getTime() > 0) {
+			if (new Date().getTime() - new Date(updated).getTime() > 300000) {
 				// stale data from MTA feed
 				$('#status').text('The MTA isn\'t providing accurate train data right now :(');
 				$('#status').show();
@@ -342,6 +353,7 @@
 				}
 			});
 		}
+	})();
 	</script>
 </body>
 </html>
