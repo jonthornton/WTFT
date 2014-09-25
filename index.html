@@ -43,9 +43,9 @@
 		<section>
 			<span class="close close-button" onclick="history.go(-1);">&times;</span>
 			<h2 class="current-station close">Where's the fucking train?</h2>
-			<a class="menu-item geolocate-only" href="#">Go to current location</a>
-			<!-- <div class="menu-item local-storage-only" id="goto-favorite-locations">Favorite stations</div>
-			<div class="menu-item local-storage-only" id="bookmark-station">Bookmark <span class="current-station"></span></div> -->
+			<a class="menu-item geolocate-only" href="#current-location">Go to current location</a>
+			<a class="menu-item local-storage-only" href="#">See favorite stations</a>
+			<div class="menu-item local-storage-only" id="add-favorite">Add <span class="current-station"></span> to favorites</div>
 			<div class="train-lines">
 				<a href="#/r/1" class="mta-bullet line-1">1</a>
 				<a href="#/r/2" class="mta-bullet line-2">2</a>
@@ -144,6 +144,13 @@
 	<script>
 	// don't pollute the global namespace!
 	(function(){
+		var DEFAULT_STATIONS = [
+			309,	// union square
+			242,	// times square
+			88,		// barclays center
+			411,	// fulton street
+		];
+
 		var stationSource = $("#station-template").html();
 		var stationTemplate = Handlebars.compile(stationSource);
 
@@ -155,7 +162,7 @@
 		  return route_id.charAt(0);
 		});
 
-		var refreshTimer, ajaxHandle, coords;
+		var refreshTimer, ajaxHandle, coords, gCurrentStation;
 		function route()
 		{
 			// start with a clean slate
@@ -167,12 +174,17 @@
 				ajaxHandle.abort();
 				ajaxHandle = null;
 			}
+			switch (window.location.hash) {
+				case '#menu':
+					$('#menu').slideDown(150);
+					hideThrobber();
+					$('#trains').hide();
+					return;
 
-			if (window.location.hash == '#menu') {
-				$('#menu').slideDown(150);
-				hideThrobber();
-				$('#trains').hide();
-				return;
+				case '#current-location':
+					// use GPS
+					gotoGPSLocation();
+					return;
 			}
 
 			$('#trains').show();
@@ -186,7 +198,7 @@
 				// train route id
 				loadTrainData(window.location.hash.charAt(4));
 			} else {
-				// use GPS
+				// favorite stations
 				loadTrainData();
 			}
 		}
@@ -197,6 +209,11 @@
 		// screen for html5 feature support
 		if (!('localStorage' in window)) {
 			$('.local-storage-only').hide();
+
+			// stub out bookmark functions
+			getBookmarks = function(){
+				return DEFAULT_STATIONS;
+			}
 		}
 		if (!('geolocation' in navigator)) {
 			$('.geolocate-only').hide();
@@ -204,6 +221,36 @@
 
 		refreshRelativeTimes()
 		setInterval(refreshRelativeTimes, 10000);
+
+		$('#add-favorite').on('click', function(){
+			addFavoriteStation(gCurrentStation.id);
+			alert(gCurrentStation.name+' has been added to your favorites.');
+		});
+
+		function getFavoriteStations()
+		{
+			var favs = localStorage.getItem('favoriteStations');
+			if (favs) {
+				return favs.split(',');
+			}
+		}
+
+		function addFavoriteStation(id)
+		{
+			var favorites = getFavoriteStations() || [];
+			favorites.unshift(id);
+			localStorage.setItem('favoriteStations', favorites.join(','));
+		}
+
+		function deleteFavoriteStation(id)
+		{
+			var favorites = getFavoriteStations() || [];
+			var index = array.indexOf(id);
+			if (index > -1) {
+			    favorites.splice(index, 1);
+			}
+			localStorage.setItem('favoriteStations', favorites.join(','));
+		}
 
 		function gotoGPSLocation()
 		{
@@ -270,12 +317,8 @@
 				showThrobber();
 			}
 
-			if (!lat && !lon) {
-				return gotoGPSLocation();
-			}
-
 			var endpoint, permalink;
-			if (lon && $.isNumeric(lat)) {
+			if (lat && lon) {
 				// lat/lon
 				endpoint = API_URL+'/by-location?lat='+lat+'&lon='+lon;
 				permalink = '#/l/'+lat+','+lon;
@@ -283,9 +326,13 @@
 					$('#permalink').prop('href', permalink)
 					$('#permalink-container').show();
 				}
-			} else {
+			} else if (lat) {
 				// train line
 				endpoint = API_URL+'/by-route/'+lat;
+			} else {
+				// saved/default favorites
+				ids = getFavoriteStations() || DEFAULT_STATIONS;
+				endpoint = API_URL+'/by-id/'+ids.join(',');
 			}
 
 			ajaxHandle = $.getJSON(endpoint)
@@ -319,7 +366,9 @@
 				container.append(html);
 			}
 
-			$('.current-station').text(data[0].name);
+			gCurrentStation = data[0]
+
+			$('.current-station').text(gCurrentStation.name);
 			refreshRelativeTimes();
 			hideThrobber();
 		}
