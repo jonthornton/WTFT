@@ -44,9 +44,9 @@
 			<span class="close close-button" onclick="history.go(-1);">&times;</span>
 			<h2 class="current-station close">Where's the fucking train?</h2>
 			<div class="menu-item geolocate-only"><a href="#current-location">Go to current location</a></div>
-			<div class="menu-item local-storage-only"><a href="#">See favorite stations</a></div>
-			<div class="menu-item favorites local-storage-only"><a href="#" id="add-favorite">Add <span class="current-station"></span> to favorites</a></div>
-			<div class="menu-item favorites local-storage-only"><a href="#" id="remove-favorite">Remove <span class="current-station"></span> from favorites</a></div>
+			<div class="menu-item"><a href="#">See favorite stations</a></div>
+			<div class="menu-item favorites"><a href="#" id="add-favorite">Add <span class="current-station"></span> to favorites</a></div>
+			<div class="menu-item favorites"><a href="#" id="remove-favorite">Remove <span class="current-station"></span> from favorites</a></div>
 			<div class="train-lines">
 				<a href="#/r/1" class="mta-bullet line-1">1</a>
 				<a href="#/r/2" class="mta-bullet line-2">2</a>
@@ -123,7 +123,10 @@
 
 	<script id="station-template" type="text/x-handlebars-template">
 		<div class="station">
-			<h2><a href="/#/l/{{coords location}}">{{name}}</a></h2>
+			<h2>
+				<a href="/#/l/{{coords location}}">{{name}}</a>
+				<a class="map-link" href="https://maps.apple.com?q={{coords location}}" target=_blank>map</a>
+			</h2>
 			{{#if hasData}}
 				<div class="uptown">
 					{{#each N}}
@@ -164,11 +167,11 @@
 		var stationTemplate = Handlebars.compile(stationSource);
 
 		Handlebars.registerHelper('coords', function(location) {
-		  return (+location[0].toFixed(6)) + "," + (+location[1].toFixed(6));
+			return (+location[0].toFixed(6)) + "," + (+location[1].toFixed(6));
 		});
 
 		Handlebars.registerHelper('routeFilter', function(route_id) {
-		  return route_id.charAt(0);
+			return route_id.charAt(0);
 		});
 
 		var refreshTimer, ajaxHandle, gUserPosition, gCurrentStation;
@@ -199,7 +202,6 @@
 						if (getFavoriteStations().indexOf(gCurrentStation.id) != -1) {
 							$('#remove-favorite').closest('.menu-item').show();
 						} else {
-							console.log(getFavoriteStations())
 							$('#add-favorite').closest('.menu-item').show();
 						}
 					}
@@ -234,18 +236,6 @@
 		$(window).on('hashchange', route);
 		route();
 
-		// screen for html5 feature support
-		if (!('localStorage' in window)) {
-			$('.local-storage-only').hide();
-
-			// stub out bookmark functions
-			getFavoriteStations = function(){
-				return DEFAULT_STATIONS;
-			}
-
-			window.localStorage.getItem = function(){};
-			window.localStorage.setItem = function(){};
-		}
 		if (!('geolocation' in navigator)) {
 			$('.geolocate-only').hide();
 		}
@@ -270,6 +260,8 @@
 				return favs.split(',').map(function(v){
 					return v * 1;
 				});
+			} else {
+				return [];
 			}
 		}
 
@@ -370,7 +362,8 @@
 				endpoint = API_URL+'/by-route/'+lat;
 			} else {
 				// saved/default favorites
-				ids = getFavoriteStations() || DEFAULT_STATIONS;
+				var ids = getFavoriteStations()
+				if (!ids.length) ids = DEFAULT_STATIONS;
 				endpoint = API_URL+'/by-id/'+ids.join(',');
 			}
 
