@@ -43,9 +43,9 @@
 		<section>
 			<span class="close close-button" onclick="history.go(-1);">&times;</span>
 			<h2 class="current-station close">Where's the fucking train?</h2>
-			<a class="menu-item geolocate-only" href="#current-location">Go to current location</a>
-			<a class="menu-item local-storage-only" href="#">See favorite stations</a>
-			<div class="menu-item local-storage-only" id="add-favorite">Add <span class="current-station"></span> to favorites</div>
+			<div class="menu-item geolocate-only"><a href="#current-location">Go to current location</a></div>
+			<div class="menu-item local-storage-only"><a href="#">See favorite stations</a></div>
+			<div class="menu-item local-storage-only"><a href="#" id="add-favorite">Add <span class="current-station"></span> to favorites</a></div>
 			<div class="train-lines">
 				<a href="#/r/1" class="mta-bullet line-1">1</a>
 				<a href="#/r/2" class="mta-bullet line-2">2</a>
@@ -58,7 +58,7 @@
 
 
 			<h3>Why do some stations say &quot;no data available&quot;?</h3>
-			<p>The MTA doesn't provide arrival times for many train lines. Currently arrival times are only available for the 1, 2, 3, 4, 5, 6, and L trains.</p>
+			<p>The MTA doesn't provide arrival times for many train lines. Currently arrival data is only available for the 1, 2, 3, 4, 5, 6, and L trains.</p>
 
 			<h3>Source Code</h3>
 			<p>WTFT is open source and available on <a href="https://github.com/jonthornton/WTFT">GitHub</a>. It's designed to pull data from <a href="https://github.com/jonthornton/MtaSanitizer">MtaSanitizer</a>.</p>
@@ -91,8 +91,12 @@
 					<span class="direction-icon">&#9660;</span> Downtown / Brooklyn
 				</span>
 
-				<div id="permalink-container">
-					Showing nearby stations. <a href="#" id="permalink">Permalink</a>
+				<div class="explanation current-location">
+					Showing nearby stations &ndash; <a href="#" id="permalink">Permalink</a>
+				</div>
+
+				<div class="explanation favorites">
+					Showing favorite stations. Use the <a href="#menu" id="permalink">menu</a> to edit favorites.
 				</div>
 			</div>
 
@@ -170,11 +174,20 @@
 			window.scrollTo(0, 0);
 			clearTimeout(refreshTimer);
 			$('.error').hide();
-			$('#permalink-container').hide();
+			$('.explanation').hide();
+			$('#trains').show();
+			$('#menu').hide();
 			if (ajaxHandle) {
 				ajaxHandle.abort();
 				ajaxHandle = null;
 			}
+
+			if (localStorage.getItem('seenMenu')) {
+				$('#menuHelp').hide();
+			} else {
+				$('#menuHelp').show();
+			}
+
 			switch (window.location.hash) {
 				case '#menu':
 					$('#menu').slideDown(150);
@@ -189,15 +202,6 @@
 					return;
 			}
 
-			$('#trains').show();
-			$('#menu').hide();
-
-			if (localStorage.getItem('seenMenu')) {
-				$('#menuHelp').hide();
-			} else {
-				$('#menuHelp').show();
-			}
-
 			var coords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
 			if (coords) {
 				// lat/lon from URL
@@ -208,6 +212,7 @@
 			} else {
 				// favorite stations
 				loadTrainData();
+				$('.explanation.favorites').show();
 			}
 		}
 
@@ -270,6 +275,7 @@
 					success: function(position) {
 						clearTimeout(errorTimer);
 						gUserPosition = [position.coords.latitude, position.coords.longitude];
+						$('.explanation.current-location').show();
 						loadTrainData(position.coords.latitude, position.coords.longitude);
 					},
 					error: function(){
@@ -335,8 +341,7 @@
 				endpoint = API_URL+'/by-location?lat='+lat+'&lon='+lon;
 				permalink = '#/l/'+lat+','+lon;
 				if (window.location.hash != permalink) {
-					$('#permalink').prop('href', permalink)
-					$('#permalink-container').show();
+					$('#permalink').prop('href', permalink);
 				}
 			} else if (lat) {
 				// train line
