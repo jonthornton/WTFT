@@ -45,7 +45,8 @@
 			<h2 class="current-station close">Where's the fucking train?</h2>
 			<div class="menu-item geolocate-only"><a href="#current-location">Go to current location</a></div>
 			<div class="menu-item local-storage-only"><a href="#">See favorite stations</a></div>
-			<div class="menu-item local-storage-only"><a href="#" id="add-favorite">Add <span class="current-station"></span> to favorites</a></div>
+			<div class="menu-item favorites local-storage-only"><a href="#" id="add-favorite">Add <span class="current-station"></span> to favorites</a></div>
+			<div class="menu-item favorites local-storage-only"><a href="#" id="remove-favorite">Remove <span class="current-station"></span> from favorites</a></div>
 			<div class="train-lines">
 				<a href="#/r/1" class="mta-bullet line-1">1</a>
 				<a href="#/r/2" class="mta-bullet line-2">2</a>
@@ -59,6 +60,9 @@
 
 			<h3>Why do some stations say &quot;no data available&quot;?</h3>
 			<p>The MTA doesn't provide arrival times for many train lines. Currently arrival data is only available for the 1, 2, 3, 4, 5, 6, and L trains.</p>
+
+			<h3>How do I edit my favorite stations?</h3>
+			<p>Find your station by selecting a train line, and tap on the station name to bring it to the top of the list. Then tap on the WTFT icon to see a menu where you can add or remove that station from your favorites.</p>
 
 			<h3>Source Code</h3>
 			<p>WTFT is open source and available on <a href="https://github.com/jonthornton/WTFT">GitHub</a>. It's designed to pull data from <a href="https://github.com/jonthornton/MtaSanitizer">MtaSanitizer</a>.</p>
@@ -190,6 +194,16 @@
 
 			switch (window.location.hash) {
 				case '#menu':
+					$('.menu-item.favorites').hide();
+					if (gCurrentStation) {
+						if (getFavoriteStations().indexOf(gCurrentStation.id) != -1) {
+							$('#remove-favorite').closest('.menu-item').show();
+						} else {
+							console.log(getFavoriteStations())
+							$('#add-favorite').closest('.menu-item').show();
+						}
+					}
+
 					$('#menu').slideDown(150);
 					hideThrobber();
 					$('#trains').hide();
@@ -198,6 +212,7 @@
 
 				case '#current-location':
 					// use GPS
+					showThrobber();
 					gotoGPSLocation();
 					return;
 			}
@@ -243,11 +258,18 @@
 			alert(gCurrentStation.name+' has been added to your favorites.');
 		});
 
+		$('#remove-favorite').on('click', function(){
+			removeFavoriteStation(gCurrentStation.id);
+			alert(gCurrentStation.name+' has been removed from your favorites.');
+		});
+
 		function getFavoriteStations()
 		{
 			var favs = localStorage.getItem('favoriteStations');
 			if (favs) {
-				return favs.split(',');
+				return favs.split(',').map(function(v){
+					return v * 1;
+				});
 			}
 		}
 
@@ -258,14 +280,14 @@
 			localStorage.setItem('favoriteStations', favorites.join(','));
 		}
 
-		function deleteFavoriteStation(id)
+		function removeFavoriteStation(id)
 		{
-			var favorites = getFavoriteStations() || [];
-			var index = array.indexOf(id);
+			var favs = getFavoriteStations() || [];
+			var index = favs.indexOf(id);
 			if (index > -1) {
-			    favorites.splice(index, 1);
+			    favs.splice(index, 1);
 			}
-			localStorage.setItem('favoriteStations', favorites.join(','));
+			localStorage.setItem('favoriteStations', favs.join(','));
 		}
 
 		function gotoGPSLocation()
