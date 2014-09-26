@@ -75,6 +75,7 @@
 		<section>
 			<div id="last-updated-container">Updated <time id="last-updated">never</time></div>
 			<a id="header-logo" href="#menu"></a>
+			<div id="menuHelp">Tap the WTFT logo in the top right to see other stations and access settings.</div>
 			<div class="error" id="status"></div>
 			<div class="error" id="error-buttons">
 				<span class="button" id="try-again" onclick="window.location.reload()">Try again</span>
@@ -162,7 +163,7 @@
 		  return route_id.charAt(0);
 		});
 
-		var refreshTimer, ajaxHandle, coords, gCurrentStation;
+		var refreshTimer, ajaxHandle, gUserPosition, gCurrentStation;
 		function route()
 		{
 			// start with a clean slate
@@ -179,6 +180,7 @@
 					$('#menu').slideDown(150);
 					hideThrobber();
 					$('#trains').hide();
+					localStorage.setItem('seenMenu', true);
 					return;
 
 				case '#current-location':
@@ -190,7 +192,13 @@
 			$('#trains').show();
 			$('#menu').hide();
 
-			coords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
+			if (localStorage.getItem('seenMenu')) {
+				$('#menuHelp').hide();
+			} else {
+				$('#menuHelp').show();
+			}
+
+			var coords = window.location.hash.match(/#\/l\/((-)?\d+\.\d+),((-)?\d+\.\d+)/);
 			if (coords) {
 				// lat/lon from URL
 				loadTrainData(1*coords[1], 1*coords[3]);
@@ -211,9 +219,12 @@
 			$('.local-storage-only').hide();
 
 			// stub out bookmark functions
-			getBookmarks = function(){
+			getFavoriteStations = function(){
 				return DEFAULT_STATIONS;
 			}
+
+			window.localStorage.getItem = function(){};
+			window.localStorage.setItem = function(){};
 		}
 		if (!('geolocation' in navigator)) {
 			$('.geolocate-only').hide();
@@ -258,6 +269,7 @@
 				var geolocate = {
 					success: function(position) {
 						clearTimeout(errorTimer);
+						gUserPosition = [position.coords.latitude, position.coords.longitude];
 						loadTrainData(position.coords.latitude, position.coords.longitude);
 					},
 					error: function(){
