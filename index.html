@@ -125,7 +125,7 @@
 		<div class="station">
 			<h2>
 				<a href="/#/l/{{coords location}}">{{name}}</a>
-				<a class="map-link" href="https://maps.apple.com?q={{coords location}}" target=_blank>map</a>
+				<a class="map-link" href="{{mapLink location}}" target=_blank>map</a>
 			</h2>
 			{{#if hasData}}
 				<div class="uptown">
@@ -168,6 +168,17 @@
 
 		Handlebars.registerHelper('coords', function(location) {
 			return (+location[0].toFixed(6)) + "," + (+location[1].toFixed(6));
+		});
+
+		var mapBase;
+		if ((navigator.userAgent.match(/iPhone/i)) || (navigator.userAgent.match(/iPad/i))) {
+			mapBase = 'http://maps.apple.com?q=';
+		} else {
+			mapBase = 'https://maps.google.com?q=';
+		}
+
+		Handlebars.registerHelper('mapLink', function(location) {
+			return mapBase + (+location[0].toFixed(6)) + ',' + (+location[1].toFixed(6));
 		});
 
 		Handlebars.registerHelper('routeFilter', function(route_id) {
