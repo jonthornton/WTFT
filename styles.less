@@ -7,7 +7,9 @@ body {
 	margin: 0;
 }
 
-a {
+a,
+.a {
+	cursor: pointer;
 	color: inherit;
 	text-decoration: none;
 	border-bottom: 1px dotted #555;
@@ -71,13 +73,6 @@ section {
 			color: inherit;
 			text-decoration: none;
 		}
-		.map-link {
-			display: inline-block;
-			color: #555;
-			border: 1px solid #444;
-			padding: 3px;
-			font-size: 11px;
-		}
 	}
 	.uptown {
 		box-sizing: border-box;
@@ -99,6 +94,19 @@ section {
 	.no-data {
 		color: #555;
 		margin: -5px 0 10px 0;
+	}
+
+	.actions {
+		margin: -5px 0 10px 0;
+		display: none;
+		a,
+		.a {
+			display: inline-block;
+			color: #888;
+			border: 1px solid #444;
+			padding: 3px;
+			margin-right: 5px;
+		}
 	}
 }
 
@@ -156,6 +164,7 @@ section {
 #legend {
 	font-size: 12px;
 	white-space: nowrap;
+	color: #888;
 	h3 {
 		text-transform: uppercase;
 		color: #444;

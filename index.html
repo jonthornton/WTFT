@@ -42,11 +42,9 @@
 	<div id="menu">
 		<section>
 			<span class="close close-button" onclick="history.go(-1);">&times;</span>
-			<h2 class="current-station close">Where's the fucking train?</h2>
+			<h2 class="close">Where's the fucking train?</h2>
 			<div class="menu-item geolocate-only"><a href="#current-location">Go to current location</a></div>
 			<div class="menu-item"><a href="#">See favorite stations</a></div>
-			<div class="menu-item favorites"><a href="#" id="add-favorite">Add <span class="current-station"></span> to favorites</a></div>
-			<div class="menu-item favorites"><a href="#" id="remove-favorite">Remove <span class="current-station"></span> from favorites</a></div>
 			<div class="train-lines">
 				<a href="#/r/1" class="mta-bullet line-1">1</a>
 				<a href="#/r/2" class="mta-bullet line-2">2</a>
@@ -62,7 +60,7 @@
 			<p>The MTA doesn't provide arrival times for many train lines. Currently arrival data is only available for the 1, 2, 3, 4, 5, 6, and L trains.</p>
 
 			<h3>How do I edit my favorite stations?</h3>
-			<p>Find your station by selecting a train line, and tap on the station name to bring it to the top of the list. Then tap on the WTFT icon to see a menu where you can add or remove that station from your favorites.</p>
+			<p>Tap on a station name to see options to add or remove it from your favorites.</p>
 
 			<h3>Source Code</h3>
 			<p>WTFT is open source and available on <a href="https://github.com/jonthornton/WTFT">GitHub</a>. It's designed to pull data from <a href="https://github.com/jonthornton/MtaSanitizer">MtaSanitizer</a>.</p>
@@ -79,7 +77,17 @@
 		<section>
 			<div id="last-updated-container">Updated <time id="last-updated">never</time></div>
 			<a id="header-logo" href="#menu"></a>
-			<div id="menuHelp">Tap the WTFT logo in the top right to see other stations and access settings.</div>
+			<div id="menuHelp">
+				<p>Tap the WTFT logo in the top right to see other stations.</p>
+
+				<h3>Legend</h3>
+				<span class="uptown">
+					<span class="direction-icon">&#9650;</span> Uptown / Manhattan
+				</span>
+				<span class="downtown">
+					<span class="direction-icon">&#9660;</span> Downtown / Brooklyn
+				</span>
+			</div>
 			<div class="error" id="status"></div>
 			<div class="error" id="error-buttons">
 				<span class="button" id="try-again" onclick="window.location.reload()">Try again</span>
@@ -96,7 +104,7 @@
 				</span>
 
 				<div class="explanation current-location">
-					Showing nearby stations &ndash; <a href="#" id="permalink">Permalink</a>
+					Showing nearby stations &ndash; <a href="#" id="permalink">permalink</a>. Use the <a href="#menu" id="permalink">menu</a> to see more stations.
 				</div>
 
 				<div class="explanation favorites">
@@ -122,11 +130,14 @@
 	</script>
 
 	<script id="station-template" type="text/x-handlebars-template">
-		<div class="station">
-			<h2>
-				<a href="/#/l/{{coords location}}">{{name}}</a>
+		<div class="station" data-station-id="{{id}}">
+			<h2><a href="/#/l/{{coords location}}">{{name}}</a></h2>
+			<div class="actions">
 				<a class="map-link" href="{{mapLink location}}" target=_blank>map</a>
-			</h2>
+				<a href="/#/l/{{coords location}}">permalink</a>
+				<span class="a fav-button add">add to favorites</span>
+				<span class="a fav-button remove">remove from favorites</span>
+			</div>
 			{{#if hasData}}
 				<div class="uptown">
 					{{#each N}}
@@ -185,7 +196,7 @@
 			return route_id.charAt(0);
 		});
 
-		var refreshTimer, ajaxHandle, gUserPosition, gCurrentStation;
+		var refreshTimer, ajaxHandle, gUserPosition;
 		function route()
 		{
 			// start with a clean slate
@@ -208,18 +219,9 @@
 
 			switch (window.location.hash) {
 				case '#menu':
-					$('.menu-item.favorites').hide();
-					if (gCurrentStation) {
-						if (getFavoriteStations().indexOf(gCurrentStation.id) != -1) {
-							$('#remove-favorite').closest('.menu-item').show();
-						} else {
-							$('#add-favorite').closest('.menu-item').show();
-						}
-					}
-
 					$('#menu').slideDown(150);
-					hideThrobber();
 					$('#trains').hide();
+					hideThrobber();
 					localStorage.setItem('seenMenu', true);
 					return;
 
@@ -254,14 +256,23 @@
 		refreshRelativeTimes()
 		setInterval(refreshRelativeTimes, 10000);
 
-		$('#add-favorite').on('click', function(){
-			addFavoriteStation(gCurrentStation.id);
-			alert(gCurrentStation.name+' has been added to your favorites.');
+		$('#live-stations').on('click', '.fav-button.add', function(e){
+			var $station = $(this).closest('.station');
+			$station.find('.fav-button').toggle();
+			addFavoriteStation($station.data('stationId'));
+			alert($station.find('h2 a').text()+' has been added to your favorites.');
 		});
 
-		$('#remove-favorite').on('click', function(){
-			removeFavoriteStation(gCurrentStation.id);
-			alert(gCurrentStation.name+' has been removed from your favorites.');
+		$('#live-stations').on('click', '.fav-button.remove', function(e){
+			var $station = $(this).closest('.station');
+			$station.find('.fav-button').toggle();
+			removeFavoriteStation($station.data('stationId'));
+			alert($station.find('h2 a').text()+' has been removed from your favorites.');
+		});
+
+		$('#live-stations').on('click', '.station h2 a', function(e){
+			$(this).closest('.station').find('.actions').toggle(100);
+			e.preventDefault();
 		});
 
 		function getFavoriteStations()
@@ -272,7 +283,9 @@
 					return v * 1;
 				});
 			} else {
-				return [];
+				// initialize defaults
+				localStorage.setItem('favoriteStations', DEFAULT_STATIONS.join(','));
+				return DEFAULT_STATIONS;
 			}
 		}
 
@@ -373,8 +386,7 @@
 				endpoint = API_URL+'/by-route/'+lat;
 			} else {
 				// saved/default favorites
-				var ids = getFavoriteStations()
-				if (!ids.length) ids = DEFAULT_STATIONS;
+				var ids = getFavoriteStations();
 				endpoint = API_URL+'/by-id/'+ids.join(',');
 			}
 
@@ -409,9 +421,17 @@
 				container.append(html);
 			}
 
-			gCurrentStation = data[0]
+			// display add/remove favorites buttons
+			var favs = getFavoriteStations();
+			$('.station').each(function(i, el) {
+				var $el = $(el);
+				if (favs.indexOf($el.data('stationId')) == -1) {
+					$el.find('.fav-button.remove').hide();
+				} else {
+					$el.find('.fav-button.add').hide();
+				}
+			});
 
-			$('.current-station').text(gCurrentStation.name);
 			refreshRelativeTimes();
 			hideThrobber();
 		}
