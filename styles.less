@@ -161,7 +161,7 @@ section {
 	background-color: #808183;
 }
 
-#legend {
+.legend {
 	font-size: 12px;
 	white-space: nowrap;
 	color: #888;
@@ -256,13 +256,27 @@ section {
 	}
 }
 
-#menuHelp {
+#first-use-help {
 	border: 1px solid #888;
 	padding: 10px;
 	margin: 20px 0 10px 0;
 	position: relative;
+
+	div+div {
+		margin-top: 10px;
+	}
+
+	h3 {
+		margin: 0 0 5px 0;
+		font-size: 16px;
+		color: inherit;
+	}
+	.legend {
+		font-size: 12px;
+		color: inherit;
+	}
 }
-#menuHelp:before {
+#first-use-help:before {
     content: ' ';
     display: block;
     position: absolute;
