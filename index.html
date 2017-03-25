@@ -148,7 +148,7 @@
 				<span class="a fav-button add">add to favorites</span>
 				<span class="a fav-button remove">remove from favorites</span>
 			</div>
-			{{#if hasData}}
+			{{#if last_update}}
 				<div class="uptown">
 					{{#each N}}
 						<div class="train">
@@ -289,9 +289,16 @@
 		{
 			var favs = localStorage.getItem('favoriteStations');
 			if (favs) {
-				return favs.split(',').map(function(v){
-					return v * 1;
-				});
+				favs = favs.split(',')
+
+				// check for old-style favorites
+				if (favs[0] && favs[0]*1 < 300) {
+					favs = null;
+				}
+			}
+
+			if (favs) {
+				return favs;
 			} else {
 				// initialize defaults
 				localStorage.setItem('favoriteStations', DEFAULT_STATIONS.join(','));
