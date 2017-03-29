@@ -292,7 +292,7 @@
 				favs = favs.split(',')
 
 				// check for old-style favorites
-				if (favs[0] && favs[0]*1 < 300) {
+				if (favs[0] && String(favs[0]*1) === favs[0]) {
 					favs = null;
 				}
 			}
