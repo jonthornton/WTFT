@@ -63,13 +63,13 @@
 
 
 			<h3>Why do some stations say &quot;no data available&quot;?</h3>
-			<p>The MTA doesn't provide arrival times for many train lines. Currently arrival data is only available for the 1, 2, 3, 4, 5, 6, and L trains.</p>
+			<p>The MTA doesn't provide arrival times for all train lines. Currently accurrate data is available for the 1, 2, 3, 4, 5, 6, and L trains. Beta (potentially incorrect) data is available for N, Q, R, W, B, and D trains.</p>
 
 			<h3>How do I edit my favorite stations?</h3>
 			<p>Tap on a station name to see options to add or remove it from your favorites.</p>
 
 			<h3>Source Code</h3>
-			<p>WTFT is open source and available on <a href="https://github.com/jonthornton/WTFT">GitHub</a>. It's designed to pull data from <a href="https://github.com/jonthornton/MtaSanitizer">MtaSanitizer</a>.</p>
+			<p>WTFT is open source and available on <a href="https://github.com/jonthornton/WTFT">GitHub</a>. It's designed to pull data from <a href="https://github.com/jonthornton/MTAPI">MTAPI</a>.</p>
 		</section>
 
 		<div class="logo-150"></div>
@@ -97,6 +97,10 @@
 						<span class="direction-icon">&#9660;</span> Downtown / Brooklyn
 					</span>
 				</div>
+
+				<div>
+					Data for N Q R W B D is in beta and may be incorrect.
+				</div>
 			</div>
 			<div class="error" id="status"></div>
 			<div class="error" id="error-buttons">
@@ -106,12 +110,18 @@
 			<div id="live-stations"></div>
 			<div class="legend">
 				<h3>Legend</h3>
-				<span class="uptown">
-					<span class="direction-icon">&#9650;</span> Uptown / Manhattan
-				</span>
-				<span class="downtown">
-					<span class="direction-icon">&#9660;</span> Downtown / Brooklyn
-				</span>
+				<div>
+					<span class="uptown">
+						<span class="direction-icon">&#9650;</span> Uptown / Manhattan
+					</span>
+					<span class="downtown">
+						<span class="direction-icon">&#9660;</span> Downtown / Brooklyn
+					</span>
+				</div>
+
+				<p>
+					Data for N Q R W B D is in beta and may be incorrect.
+				</p>
 
 				<div class="explanation current-location">
 					Showing nearby stations &ndash; <a href="#" id="permalink">permalink</a>. Use the <a href="#menu" id="permalink">menu</a> to see more stations.
@@ -123,7 +133,7 @@
 			</div>
 
 			<div class="footer">
-				&copy; 2014 <a href="http://www.jonthornton.com">Jon Thornton</a> &hearts; NYC
+				&copy; 2017 <a href="http://www.jonthornton.com">Jon Thornton</a> &hearts; NYC
 			</div>
 		</section>
 	</div>
