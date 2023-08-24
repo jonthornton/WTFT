@@ -383,9 +383,14 @@
 
 		function ajaxErrorHandler(resp)
 		{
-			// resp.status always seems to be 0...
 			switch(resp.status) {
 				case 404:
+					if (window.location.hash.length === 0) {
+						// 404 on the homepage means that favorites are borked; reset them
+						localStorage.setItem('favoriteStations', DEFAULT_STATIONS.join(','));
+						route();
+						break;
+					}
 					replaceState('menu');
 					route();
 					break;
