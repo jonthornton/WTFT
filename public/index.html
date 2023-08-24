@@ -306,11 +306,6 @@
 			var favs = localStorage.getItem('favoriteStations');
 			if (favs) {
 				favs = favs.split(',')
-
-				// check for old-style favorites
-				if (favs[0] && String(favs[0]*1) === favs[0]) {
-					favs = null;
-				}
 			}
 
 			if (favs) {
@@ -325,7 +320,7 @@
 		function addFavoriteStation(id)
 		{
 			var favorites = getFavoriteStations() || [];
-			favorites.unshift(id);
+			favorites.unshift(id.toString());
 			localStorage.setItem('favoriteStations', favorites.join(','));
 		}
 
