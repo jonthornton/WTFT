@@ -4,3 +4,4 @@ node_modules
 dev/
 .DS_Store
 settings.js
+public/settings.js
