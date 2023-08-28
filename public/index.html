@@ -151,7 +151,7 @@
 	<script src="dist/fastclick.min.js"></script>
 	<script>
 		$(function() {
-		    FastClick.attach(document.body);
+			FastClick.attach(document.body);
 		});
 	</script>
 
@@ -319,19 +319,25 @@
 
 		function addFavoriteStation(id)
 		{
+			id = id.toString();
 			var favorites = getFavoriteStations() || [];
-			favorites.unshift(id.toString());
+			if (index > -1) {
+				return;
+			}
+
+			favorites.unshift(id);
 			localStorage.setItem('favoriteStations', favorites.join(','));
 		}
 
 		function removeFavoriteStation(id)
 		{
+			id = id.toString();
 			var favs = getFavoriteStations() || [];
 			var index = favs.indexOf(id);
 			if (index > -1) {
-			    favs.splice(index, 1);
+				favs.splice(index, 1);
+				localStorage.setItem('favoriteStations', favs.join(','));
 			}
-			localStorage.setItem('favoriteStations', favs.join(','));
 		}
 
 		function gotoGPSLocation()
@@ -458,7 +464,7 @@
 			var favs = getFavoriteStations();
 			$('.station').each(function(i, el) {
 				var $el = $(el);
-				if (favs.indexOf($el.data('stationId')) == -1) {
+				if (favs.indexOf($el.data('stationId').toString()) == -1) {
 					$el.find('.fav-button.remove').hide();
 				} else {
 					$el.find('.fav-button.add').hide();
