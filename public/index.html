@@ -320,13 +320,14 @@
 		function addFavoriteStation(id)
 		{
 			id = id.toString();
-			var favorites = getFavoriteStations() || [];
+			var favs = getFavoriteStations() || [];
+			var index = favs.indexOf(id);
 			if (index > -1) {
 				return;
 			}
 
-			favorites.unshift(id);
-			localStorage.setItem('favoriteStations', favorites.join(','));
+			favs.unshift(id);
+			localStorage.setItem('favoriteStations', favs.join(','));
 		}
 
 		function removeFavoriteStation(id)
