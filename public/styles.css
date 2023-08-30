@@ -185,13 +185,12 @@ section {
 
 .mta-bullet.line-S,
 .mta-bullet.line-FS,
-.mta-bullet.line-RS {
+.mta-bullet.line-H {
 	background-color: #808183;
 }
 
-.mta-bullet.line-S .sub-route,
 .mta-bullet.line-FS .sub-route,
-.mta-bullet.line-RS .sub-route {
+.mta-bullet.line-H .sub-route {
 	font-size: 8px;
 }
 

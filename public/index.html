@@ -219,6 +219,13 @@
 		});
 
 		Handlebars.registerHelper('routeFilter', function(route_id) {
+			//
+			if (route_id === 'H') {
+				// The MTA calls the Rockaway shuttle route "H" internally
+				// but refers to it as S or RS externally
+				route_id = 'RS';
+			}
+
 			if (route_id.length == 2) {
 				return '<span>'+route_id.charAt(1)+'</span><span class="sub-route">'+route_id.charAt(0)+'</span>'
 			} else {
