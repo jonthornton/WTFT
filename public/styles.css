@@ -62,52 +62,57 @@ section {
 .station {
 	position: relative;
 	margin: 0 0 10px 0;
+}
 
-	h2 {
-		font-size: 23px;
-		font-weight: 300;
-		color: #eee;
-		margin: 25px 0 15px 0;
-		line-height: 1;
-		a {
-			color: inherit;
-			text-decoration: none;
-		}
-	}
-	.uptown {
-		box-sizing: border-box;
-		width: 50%;
-		float: left;
-	}
-	.downtown {
-		width: 50%;
-		margin-left: 50%;
-	}
-	.train {
-		margin-bottom: 8px;
-	}
+.station h2 {
+	font-size: 23px;
+	font-weight: 300;
+	color: #eee;
+	margin: 25px 0 15px 0;
+	line-height: 1;
+}
 
-	.train:nth-child(n+6){
-	    display: none;
-	}
+.station h2 a {
+	color: inherit;
+	text-decoration: none;
+}
 
-	.no-data {
-		color: #555;
-		margin: -5px 0 10px 0;
-	}
+.station .uptown {
+	box-sizing: border-box;
+	width: 50%;
+	float: left;
+}
 
-	.actions {
-		margin: -5px 0 10px 0;
-		display: none;
-		a,
-		.a {
-			display: inline-block;
-			color: #888;
-			border: 1px solid #444;
-			padding: 3px;
-			margin-right: 5px;
-		}
-	}
+.station .downtown {
+	width: 50%;
+	margin-left: 50%;
+}
+
+.station .train {
+	margin-bottom: 8px;
+}
+
+.station .train:nth-child(n+6) {
+	display: none;
+}
+
+.station .no-data {
+	color: #555;
+	margin: -5px 0 10px 0;
+}
+
+.station .actions {
+	margin: -5px 0 10px 0;
+	display: none;
+}
+
+.station .actions a,
+.station .actions .a {
+	display: inline-block;
+	color: #888;
+	border: 1px solid #444;
+	padding: 3px;
+	margin-right: 5px;
 }
 
 .train time {
@@ -126,7 +131,7 @@ section {
 
 .mta-bullet {
 	display: inline-block;
-	width:  1.3em;
+	width: 1.3em;
 	height: 1.3em;
 	margin-top: -0.3em;
 	line-height: 1.25;
@@ -139,6 +144,7 @@ section {
 	text-decoration: none;
 	border: none;
 }
+
 .mta-bullet.line-4,
 .mta-bullet.line-5,
 .mta-bullet.line-6,
@@ -177,8 +183,9 @@ section {
 	background-color: #0039A6;
 }
 
-
-.mta-bullet.line-S {
+.mta-bullet.line-S,
+.mta-bullet.line-FS,
+.mta-bullet.line-RS {
 	background-color: #808183;
 }
 
@@ -199,16 +206,18 @@ section {
 	font-size: 12px;
 	white-space: nowrap;
 	color: #888;
-	h3 {
-		text-transform: uppercase;
-		color: #444;
-		font-size: 11px;
-		margin: 30px 0 0 0;
-	}
-	.uptown {
-		display: inline-block;
-		width: 50%;
-	}
+}
+
+.legend h3 {
+	text-transform: uppercase;
+	color: #444;
+	font-size: 11px;
+	margin: 30px 0 0 0;
+}
+
+.legend .uptown {
+	display: inline-block;
+	width: 50%;
 }
 
 .explanation {
@@ -241,23 +250,23 @@ section {
 	left: 0;
 	z-index: 1000;
 	background: #ccc;
+}
 
-	.logo-150 {
-		-webkit-animation: throbber 2s infinite linear;
-		-moz-animation: throbber 2s infinite linear;
-		-ms-animation: throbber 2s infinite linear;
-		-o-animation: throbber 2s infinite linear;
-		animation: throbber 2s infinite linear;
-		-webkit-backface-visibility: hidden;
-		backface-visibility: hidden;
-		-webkit-perspective: 1000;
-		perspective: 1000;
-		position: absolute;
-		top: 50%;
-		left: 50%;
-		margin-left: -75px;
-		margin-top: -75px;
-	}
+#throbber .logo-150 {
+	-webkit-animation: throbber 2s infinite linear;
+	-moz-animation: throbber 2s infinite linear;
+	-ms-animation: throbber 2s infinite linear;
+	-o-animation: throbber 2s infinite linear;
+	animation: throbber 2s infinite linear;
+	-webkit-backface-visibility: hidden;
+	backface-visibility: hidden;
+	-webkit-perspective: 1000;
+	perspective: 1000;
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	margin-left: -75px;
+	margin-top: -75px;
 }
 
 @-webkit-keyframes throbber {
@@ -295,36 +304,38 @@ section {
 	padding: 10px;
 	margin: 20px 0 10px 0;
 	position: relative;
-
-	div+div {
-		margin-top: 10px;
-	}
-
-	h3 {
-		margin: 0 0 5px 0;
-		font-size: 16px;
-		color: inherit;
-	}
-	.legend {
-		font-size: 12px;
-		color: inherit;
-	}
 }
+
+#first-use-help div + div {
+	margin-top: 10px;
+}
+
+#first-use-help h3 {
+	margin: 0 0 5px 0;
+	font-size: 16px;
+	color: inherit;
+}
+
+#first-use-help .legend {
+	font-size: 12px;
+	color: inherit;
+}
+
 #first-use-help:before {
-    content: ' ';
-    display: block;
-    position: absolute;
-    right: 10px;
-    top: -8px;
-    width: 14px;
-    height: 14px;
-    border-color: #888;
-    border-width: 1px;
-    border-style: solid none none solid;
-    background-color: #222;
-    transform: rotate(45deg);
-    -webkit-transform: rotate(45deg);
-    -moz-transform: rotate(45deg);
+	content: ' ';
+	display: block;
+	position: absolute;
+	right: 10px;
+	top: -8px;
+	width: 14px;
+	height: 14px;
+	border-color: #888;
+	border-width: 1px;
+	border-style: solid none none solid;
+	background-color: #222;
+	transform: rotate(45deg);
+	-webkit-transform: rotate(45deg);
+	-moz-transform: rotate(45deg);
 }
 
 #menu {
@@ -336,71 +347,73 @@ section {
 	top: 0;
 	left: 0;
 	width: 100%;
+}
 
-	.close-button {
-		display: block;
-		position: absolute;
-		top: -45px;
-		right: -8px;
-		padding: 5px;
-		font-size: 85px;
-		color: #aaa;
-		font-weight: 300;
-		cursor: pointer;
-	}
-	h2 {
-		padding-right: 50px;
-		color: #eee;
-	}
-	h3 {
-		font-weight: inherit;
-		margin: 30px 0 5px 0;
-	}
+#menu .close-button {
+	display: block;
+	position: absolute;
+	top: -45px;
+	right: -8px;
+	padding: 5px;
+	font-size: 85px;
+	color: #aaa;
+	font-weight: 300;
+	cursor: pointer;
+}
 
-	p {
-		margin: 5px 0 15px 0;
-	}
+#menu h2 {
+	padding-right: 50px;
+	color: #eee;
+}
 
-	a {
-		border-color: #aaa;
-	}
+#menu h3 {
+	font-weight: inherit;
+	margin: 30px 0 5px 0;
+}
 
-	.menu-item {
-		font-weight: 300;
-		color: #444;
-		margin: 25px 0 15px 0;
-		line-height: 1;
-		font-size: 23px;
-		cursor: pointer;
-		display: block;
-		text-decoration: none;
-	}
+#menu p {
+	margin: 5px 0 15px 0;
+}
 
-	.train-lines {
-		font-size: 45px;
-		line-height: 1.4;
-		margin: 25px 0 40px 0;
-	}
+#menu a {
+	border-color: #aaa;
+}
 
-	.logo-150 {
-		display: block;
-		margin: 20px auto;
-	}
+#menu .menu-item {
+	font-weight: 300;
+	color: #444;
+	margin: 25px 0 15px 0;
+	line-height: 1;
+	font-size: 23px;
+	cursor: pointer;
+	display: block;
+	text-decoration: none;
+}
+
+#menu .train-lines {
+	font-size: 45px;
+	line-height: 1.4;
+	margin: 25px 0 40px 0;
+}
+
+#menu .logo-150 {
+	display: block;
+	margin: 20px auto;
 }
 
 .error {
 	display: none;
+}
 
-	.button {
-		display: inline-block;
-		width: 125px;
-		padding: 10px 0;
-		border: 3px solid #333;
-		margin: 0 10px;
-		cursor: pointer;
-		color: inherit;
-		text-decoration: none;
-	}
+.error .button {
+	display: inline-block;
+	width: 125px;
+	padding: 10px 0;
+	border: 3px solid #333;
+	margin: 0 10px;
+	cursor: pointer;
+	color: inherit;
+	text-decoration: none;
 }
 
 #status {
