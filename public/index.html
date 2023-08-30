@@ -169,7 +169,7 @@
 					{{#each N}}
 						<div class="train">
 							<span class="direction-icon">&#9650;</span>
-							<span class="mta-bullet line-{{routeFilter route}}">{{routeFilter route}}</span>
+							<span class="mta-bullet line-{{route}}">{{{routeFilter route}}}</span>
 							<time datetime="{{time}}"></time>
 						</div>
 					{{/each}}
@@ -178,7 +178,7 @@
 					{{#each S}}
 						<div class="train">
 							<span class="direction-icon">&#9660;</span>
-							<span class="mta-bullet line-{{routeFilter route}}">{{routeFilter route}}</span>
+							<span class="mta-bullet line-{{route}}">{{{routeFilter route}}}</span>
 							<time datetime="{{time}}"></time>
 						</div>
 					{{/each}}
@@ -219,6 +219,11 @@
 		});
 
 		Handlebars.registerHelper('routeFilter', function(route_id) {
+			if (route_id.length == 2) {
+				return '<span>'+route_id.charAt(1)+'</span><span class="sub-route">'+route_id.charAt(0)+'</span>'
+			} else {
+				return route_id.charAt(0);
+			}
 			return route_id.charAt(0);
 		});
 

@@ -189,6 +189,12 @@ section {
 	background-color: #808183;
 }
 
+.mta-bullet.line-S .sub-route,
+.mta-bullet.line-FS .sub-route,
+.mta-bullet.line-RS .sub-route {
+	font-size: 8px;
+}
+
 .mta-bullet.line-G {
 	background-color: #6CBE45;
 }
