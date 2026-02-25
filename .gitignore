@@ -5,3 +5,5 @@ dev/
 .DS_Store
 settings.js
 public/settings.js
+Vagrantfile
+.vagrant

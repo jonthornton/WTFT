@@ -92,7 +92,7 @@ section {
 	margin-bottom: 8px;
 }
 
-.station .train:nth-child(n+6) {
+.station.truncate .train:nth-child(n+6) {
 	display: none;
 }
 
@@ -113,6 +113,18 @@ section {
 	border: 1px solid #444;
 	padding: 3px;
 	margin-right: 5px;
+}
+
+.station .actions .show-more {
+	display: none;
+}
+
+.station.truncate .actions .show-more {
+	display: inline-block;
+}
+
+.station.truncate .actions .show-less {
+	display: none;
 }
 
 .train time {

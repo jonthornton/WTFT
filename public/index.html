@@ -156,9 +156,11 @@
 	</script>
 
 	<script id="station-template" type="text/x-handlebars-template">
-		<div class="station" data-station-id="{{id}}">
+		<div class="station truncate" data-station-id="{{id}}">
 			<h2><a href="/#/l/{{coords location}}">{{name}}</a></h2>
 			<div class="actions">
+				<span class="a show-more">show more</span>
+				<span class="a show-less">show less</span>
 				<a class="map-link" href="{{mapLink location}}" target=_blank>map</a>
 				<a href="/#/l/{{coords location}}">permalink</a>
 				<span class="a fav-button add">add to favorites</span>
@@ -306,6 +308,16 @@
 			$station.find('.fav-button').toggle();
 			removeFavoriteStation($station.data('stationId'));
 			alert($station.find('h2 a').text()+' has been removed from your favorites.');
+		});
+
+		$('#live-stations').on('click', '.show-more', function(e){
+			var $station = $(this).closest('.station');
+			$station.removeClass('truncate')
+		});
+
+		$('#live-stations').on('click', '.show-less', function(e){
+			var $station = $(this).closest('.station');
+			$station.addClass('truncate')
 		});
 
 		$('#live-stations').on('click', '.station h2 a', function(e){
